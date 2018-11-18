@@ -1,4 +1,5 @@
 #!/bin/sh
+#supports_backup in PINN
 
 # NOOBS partition setup script for Void Linux ARM
 #  - part1 == boot partition (FAT), part2 == root partitions (ext4)
@@ -19,11 +20,14 @@ mkdir /tmp/2
 # mount partitions
 mount ${part1} /tmp/1
 mount ${part2} /tmp/2
-mv /tmp/2/boot/* /tmp/1/
+
+if [ -z $restore ]; then
+  mv /tmp/2/boot/* /tmp/1/
+fi
 
 # adjust files
-sed -ie "s|/dev/mmcblk0p2|${part2}|" /tmp/1/cmdline.txt
-sed -ie "s|/dev/mmcblk0p1|${part1}|" /tmp/2/etc/fstab
+sed /tmp/1/cmdline.txt -i -e "s|root=[^ ]*|root=${part2}|"
+sed /tmp/2/etc/fstab -i -e "s|^[^#].* /boot |${part1}  /boot |"
 
 # clean up
 umount /tmp/1

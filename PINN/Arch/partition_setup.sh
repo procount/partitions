@@ -1,4 +1,5 @@
 #!/bin/sh
+#supports_backup in PINN
 
 # NOOBS partition setup script for Arch Linux ARM
 #  - part1 == boot partition (FAT), part2 == root partitions (ext4)
@@ -7,7 +8,7 @@
 
 # extract and set part1 and part2 variables
 
-if [[ ${part1} == '' || ${part2} == '' ]]; then
+if [ ${part1} == '' || ${part2} == '' ]; then
   echo "error: part1 and part2 not specified"
   exit 1
 fi
@@ -19,11 +20,14 @@ mkdir /tmp/2
 # mount partitions
 mount ${part1} /tmp/1
 mount ${part2} /tmp/2
-mv /tmp/2/boot/* /tmp/1/
+
+if [ -z $restore ]; then
+    mv /tmp/2/boot/* /tmp/1/
+fi
 
 # adjust files
-sed -ie "s|/dev/mmcblk0p2|${part2}|" /tmp/1/cmdline.txt
-sed -ie "s|/dev/mmcblk0p1|${part1}|" /tmp/2/etc/fstab
+sed /tmp/1/cmdline.txt -i -e "s|root=[^ ]*|root=${part2}|"
+sed /tmp/2/etc/fstab -i -e "s|^[^#].* /boot |${part1}  /boot |"
 
 # clean up
 umount /tmp/1

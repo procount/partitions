@@ -1,4 +1,5 @@
 #!/bin/sh -x
+#supports_backup in PINN
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
 #      Copyright (C) 2009-2016 Stephan Raue (stephan@openelec.tv)
@@ -54,9 +55,11 @@ fi
 # mount needed partition
   mount $part1 $MOUNTPOINT
 
-# check md5sum
-  md5sumCheck kernel.img
-  md5sumCheck SYSTEM
+if [ -z $restore ]; then
+  # check md5sum
+    md5sumCheck kernel.img
+    md5sumCheck SYSTEM
+fi
 
 # create bootloader configuration
   echo "creating bootloader configuration..."

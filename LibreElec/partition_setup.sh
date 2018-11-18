@@ -17,6 +17,8 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+#supports_backup in PINN
+
 MOUNTPOINT="/tmp/LibreELEC-System"
 
 md5sumCheck() {
@@ -55,8 +57,10 @@ fi
   mount $part1 $MOUNTPOINT
 
 # check md5sum
+if [ -z $restore ]; then
   md5sumCheck kernel.img
   md5sumCheck SYSTEM
+fi
 
 # create bootloader configuration
   echo "creating bootloader configuration..."

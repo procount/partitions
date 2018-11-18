@@ -1,7 +1,7 @@
 #!/bin/sh
+#supports_backup in PINN
 
 set -ex
-
 
 if [ -z "$part1" ] || [ -z "$part2" ] || [ -z "$part3" ]; then
   printf "Error: missing environment variable part1 or part2 or part 3\n" 1>&2
@@ -28,8 +28,8 @@ cpio -i -F ../ramdisk.cpio
 
 device=`grep "^/dev.* /system" fstab.rpi3 | cut -d ' ' -f1 | cut -d 'p' -f1`
 
-sed fstab.rpi3 -i -e "s|^/dev.* /system |$p2  /system |"
-sed fstab.rpi3 -i -e "s|^/dev.* /data   |$p3  /data |"
+sed fstab.rpi3 -i -e "s|^[^#]/dev.* /system |$p2  /system |"
+sed fstab.rpi3 -i -e "s|^[^#]/dev.* /data   |$p3  /data |"
 
 cpio -i -t -F ../ramdisk.cpio | cpio -o -H newc >../ramdisk_new.cpio
 cd ..

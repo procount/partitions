@@ -1,4 +1,5 @@
 #!/bin/sh
+#supports_backup in PINN
 
 set -ex
 
@@ -26,29 +27,33 @@ sed /tmp/2/etc/fstab -i -e "s|\t| |g"
 sed /tmp/2/etc/fstab -i -e "s|^[^#].* / |${part2}  / |"
 sed /tmp/2/etc/fstab -i -e "s|^[^#].* /boot |${part1}  /boot |"
 
-#Hide /Settings from gentoo filemanager by mounting it 'noauto'
-mkdir -p /tmp/2/mnt/Settings
-len=${#part2}
-c2=`echo $part2 | cut -c$len`
-let len-=1
-c1=`echo $part2 | cut -c$len`
-let len-=1
 
-if [ $c1 == "1" -o $c1 == "2" ]; then
-	c1="0"
+if [ -z $restore ]; then
+  #Hide /Settings from gentoo filemanager by mounting it 'noauto'
+  mkdir -p /tmp/2/mnt/Settings
+  len=${#part2}
+  c2=`echo $part2 | cut -c$len`
+  let len-=1
+  c1=`echo $part2 | cut -c$len`
+  let len-=1
+
+  if [ $c1 == "1" -o $c1 == "2" ]; then
+	  c1="0"
+  fi
+  if [ ${part2:0:4} != "PART" -a $c1 == "0" ]; then
+	  c1=""
+  fi
+  c2="5"
+  part3=${part2:0:$len}$c1$c2
+  echo "${part3} /mnt/Settings ext4 defaults,noatime,noauto 0 0" >>/tmp/2/etc/fstabfi
+
+  #Prevent root partition expansion - already done by PINN
+  mv /tmp/1/autoexpand_root_partition /tmp/1/autoexpand_root_none #Keeps timestamp
 fi
-if [ ${part2:0:4} != "PART" -a $c1 == "0" ]; then
-	c1=""
-fi
-c2="5"
-part3=${part2:0:$len}$c1$c2
-echo "${part3} /mnt/Settings ext4 defaults,noatime,noauto 0 0" >>/tmp/2/etc/fstab
 
 touch -r /tmp/2/etc/fstab.bak /tmp/2/etc/fstab	#restore timestamp
 rm /tmp/2/etc/fstab.bak
 
-#Prevent root partition expansion - already done by PINN
-mv /tmp/1/autoexpand_root_partition /tmp/1/autoexpand_root_none #Keeps timestamp
 
 #Modify last shutdowntime (if necessary) to prevent fsck on first boot
 datelt()
@@ -74,3 +79,4 @@ datelt $timeLastWrite $timeNow && touch $file
 
 umount /tmp/1
 umount /tmp/2
+

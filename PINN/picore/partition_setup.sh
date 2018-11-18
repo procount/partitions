@@ -1,4 +1,5 @@
 #!/bin/sh
+#supports_backup in PINN
 
 set -ex
 
