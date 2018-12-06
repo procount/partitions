@@ -57,10 +57,8 @@ fi
   mount $part1 $MOUNTPOINT
 
 # check md5sum
-if [ -z $restore ]; then
-  md5sumCheck kernel.img
-  md5sumCheck SYSTEM
-fi
+md5sumCheck kernel.img
+md5sumCheck SYSTEM
 
 # create bootloader configuration
   echo "creating bootloader configuration..."
